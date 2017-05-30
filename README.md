@@ -1,6 +1,6 @@
 ## About Me
 
-![Profile](https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAsTAAAAJDVkZTg1MTM0LWM0NTAtNDFlNy1iY2IwLTE4NzUxMzU0MjIyYQ.jpg)
+![Profile](https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAsTAAAAJDVkZTg1MTM0LWM0NTAtNDFlNy1iY2IwLTE4NzUxMzU0MjIyYQ.jpg width="150" height="150")
 
 I'm Jaison Saji Chacko, a Computer Science student at Christ University. I am a passionate programmer and web enthusiast currently doing research on semantic image annotation using deep learning.
 
