@@ -16,7 +16,6 @@ A telegram bot that fetches random funny image posts from Reddit. [Github](https
 
 ## Social Media
 
-- [GitHub](https://github.com/jsn5)
 - [Twitter](https://twitter.com/jaisonsaji)
 - [LinkedIn](https://www.linkedin.com/in/jaisonsaji/)
 
