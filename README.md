@@ -13,8 +13,10 @@ A self driving AI trained to play superTuxCart (a linux variant of Super Mario K
 ### RandomRedditBot
 
 [http://telegram.me/randomredditbot](http://telegram.me/randomredditbot)
-A telegram bot that fetches random funny image posts from Reddit. 
-[Github](https://github.com/jsn5/RandomRedditBot)
+
+A telegram bot that fetches random funny image posts from Reddit. [Github](https://github.com/jsn5/RandomRedditBot)
+
+
 ## Social Media
 
 - [Twitter](https://twitter.com/jaisonsaji)
