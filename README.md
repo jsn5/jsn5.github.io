@@ -2,7 +2,12 @@
 
 ![Profile](https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAsTAAAAJDVkZTg1MTM0LWM0NTAtNDFlNy1iY2IwLTE4NzUxMzU0MjIyYQ.jpg)
 
-I'm Jaison Saji Chacko, a Computer Science student at Christ University. I am a passionate programmer and web enthusiast currently doing research on semantic image annotation using deep learning.
+I'm Jaison Saji Chacko, a Computer Science student at Christ University. I am into machine learning, computer vision, semantic web and web dev. 
+
+## My Research work
+
+Semantic image annotation using convolutional neural network. [Github](https://github.com/jsn5/https://github.com/jsn5/semanticImageGraph)
+
 
 
 ## Open Source Projects
