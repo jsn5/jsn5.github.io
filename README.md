@@ -24,8 +24,8 @@ A telegram bot that fetches random funny image posts from Reddit. [Github](https
 
 ## Achievements
 
- Winner of 'Power of Connected' Hackathon by Honeywell.
- Winner of 'India stack on Azure' by Microsoft and Accenture.
+- Winner of 'Power of Connected' Hackathon by Honeywell.
+- Winner of 'India stack on Azure' by Microsoft and Accenture.
 
 
 ## Social Media
