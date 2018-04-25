@@ -1,6 +1,6 @@
 ## About Me
 
-![Profile](https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAsTAAAAJDVkZTg1MTM0LWM0NTAtNDFlNy1iY2IwLTE4NzUxMzU0MjIyYQ.jpg)
+![Profile](https://avatars3.githubusercontent.com/u/4473110?s=460&v=4)
 
 I'm Jaison Saji Chacko, a Computer Science student at Christ University. I am into machine learning, computer vision, semantic web and web dev. 
 
