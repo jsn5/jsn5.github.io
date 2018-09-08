@@ -25,7 +25,7 @@ A telegram bot that fetches random funny image posts from Reddit. [Github](https
 
 ## My Research work
 
-Semantic image annotation using convolutional neural network. [Github](https://github.com/jsn5/semanticImageGraph) [Paper](https://www.sciencepubco.com/index.php/ijet/article/view/9886/0)
+Semantic image annotation using convolutional neural network. [Github](https://github.com/jsn5/semanticImageGraph) , [Paper](https://www.sciencepubco.com/index.php/ijet/article/view/9886/0)
 
 
 ## Achievements
