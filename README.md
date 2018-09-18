@@ -1,6 +1,6 @@
 ## About Me
 
-<img src="https://avatars3.githubusercontent.com/u/4473110?s=460&v=4" alt="Profile" width="150px"/>
+<img src="https://avatars3.githubusercontent.com/u/4473110?s=460&v=4" alt="Profile" width="150px" style="border:1px;border-radius:100px" />
 
 
 I'm Jaison Saji Chacko, an ML Engineer from India. I am into deep learning, computer vision and linked data. 
