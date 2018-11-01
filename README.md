@@ -34,8 +34,9 @@ Semantic image annotation using convolutional neural network. [Github](https://g
 - Winner of 'India stack on Azure' by Microsoft and Accenture.
 
 
-## Social Media
+## Find me on
 
 - [Twitter](https://twitter.com/jaisonsaji)
 - [LinkedIn](https://www.linkedin.com/in/jaisonsaji/)
+- [Medium](https://medium.com/jaisonsaji)
 
