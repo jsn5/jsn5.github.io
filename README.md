@@ -38,5 +38,5 @@ Semantic image annotation using convolutional neural network. [Github](https://g
 
 - [Twitter](https://twitter.com/jaisonsaji)
 - [LinkedIn](https://www.linkedin.com/in/jaisonsaji/)
-- [Medium](https://medium.com/jaisonsaji)
+- [Medium](https://medium.com/@jaisonsaji)
 
