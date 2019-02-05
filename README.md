@@ -16,23 +16,16 @@ Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [G
 
 A self driving AI trained to play superTuxCart (a linux variant of Super Mario Kart). [Github](https://github.com/jsn5/pytuxkart)
 
-### RandomRedditBot
-
-[http://telegram.me/randomredditbot](http://telegram.me/randomredditbot)
-
-A telegram bot that fetches random funny image posts from Reddit. [Github](https://github.com/jsn5/RandomRedditBot)
-
-
 ## My Research work
 
-Semantic image annotation using convolutional neural network. [Github](https://github.com/jsn5/semanticImageGraph) , [Paper](https://www.sciencepubco.com/index.php/ijet/article/view/9886/0)
+Semantic image annotation using convolutional neural network.[Paper](https://www.sciencepubco.com/index.php/ijet/article/view/9886/0)
 
 
 ## Achievements
 
 - Winner of 'Power of Connected' Hackathon by Honeywell.
 - Winner of 'India stack on Azure' by Microsoft and Accenture.
-
+- Winner of UIPath PowerUp Automation 'Most Disruptive Idea' award.
 
 ## Find me on
 
