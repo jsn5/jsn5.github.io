@@ -25,7 +25,7 @@ Semantic image annotation using convolutional neural network.[Paper](https://www
 
 - Winner of 'Power of Connected' Hackathon by Honeywell.
 - Winner of 'India stack on Azure' by Microsoft and Accenture.
-- Winner of UIPath PowerUp Automation 'Most Disruptive Idea' award.
+- Winner of 'Most Disruptive Idea', PowerUp Automation Hackathon by UiPath.
 
 ## Find me on
 
