@@ -10,11 +10,12 @@
 
 ### DanceNet
 ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif ) ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif )
-
+<br/>
 Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [Github](https://github.com/jsn5/dancenet)
 
 ### PyTuxCart
 <img src="https://raw.githubusercontent.com/jsn5/pytuxkart/master/gameai.gif" alt="PytuxKart">
+<br/>
 A self driving AI trained to play superTuxCart (a linux variant of Super Mario Kart). [Github](https://github.com/jsn5/pytuxkart)
 
 ## My Research work
