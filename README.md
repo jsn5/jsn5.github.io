@@ -3,7 +3,7 @@
 <img src="https://avatars3.githubusercontent.com/u/4473110?s=460&v=4" alt="Profile" width="150px" style="border:10px;border-radius:100px" />
 
 
-Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I am into deep learning, computer vision and linked data. 
+<h2>Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I work mostly on deep learning and computer vision applications. Tinkering with Raspberry Pi, opensource ML projects or attending hackathons when not working. </h2> 
 
 
 ## Open Source Projects
