@@ -9,11 +9,13 @@ Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I am into deep learning, 
 ## Open Source Projects
 
 ### DanceNet
+![](https://github.com/jsn5/dancenet/blob/master/demo.gif ) ![](https://github.com/jsn5/dancenet/blob/master/demo2.gif )
+
 
 Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [Github](https://github.com/jsn5/dancenet)
 
 ### PyTuxCart
-
+<img src="https://raw.githubusercontent.com/jsn5/pytuxkart/master/gameai.gif" alt="PytuxKart">
 A self driving AI trained to play superTuxCart (a linux variant of Super Mario Kart). [Github](https://github.com/jsn5/pytuxkart)
 
 ## My Research work
