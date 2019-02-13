@@ -9,8 +9,7 @@ Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I am into deep learning, 
 ## Open Source Projects
 
 ### DanceNet
-![](https://github.com/jsn5/dancenet/blob/master/demo.gif ) ![](https://github.com/jsn5/dancenet/blob/master/demo2.gif )
-
+![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif ) ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif )
 
 Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [Github](https://github.com/jsn5/dancenet)
 
