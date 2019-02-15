@@ -21,6 +21,7 @@ Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [G
 <img src="https://pbs.twimg.com/media/DsOlTleX4AE6WsX?format=jpg" height="300px" width="600px" alt="DrivePi" />
 <br/>
 A self-driving (toy) car built using Raspberry Pi, Keras and Floyhub GPUs. (In progress) [Blog series](https://blog.floydhub.com/toy-self-driving-car-part-one/)
+<hr/>
 
 ### PyTuxCart
 <img src="https://raw.githubusercontent.com/jsn5/pytuxkart/master/gameai.gif" alt="PytuxKart" />
