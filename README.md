@@ -9,10 +9,16 @@
 ## Open Source Projects
 
 ### DanceNet
-
-1                          |  2
-:-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif )  |  ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif )
+<table>
+<tr>
+<td>
+<img src="https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif"/>
+ </td>
+ <td>
+ <img src="https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif"/>
+ </td>
+ </tr>
+ </table>
  
 <br/>
 Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [Github](https://github.com/jsn5/dancenet)
@@ -33,10 +39,19 @@ Semantic image annotation using convolutional neural network.[Paper](https://www
 
 ## Achievements
 
-'Power of Connected' Hackathon by Honeywell.|'India stack on Azure' by Microsoft and Accenture.|PowerUp Automation Hackathon by UiPath
-:-------------------------:|:-------------------------:|:-------------------------:
-![](https://pbs.twimg.com/media/DB-rG6YUAAAJXyE?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DB-rGE_U0AASmkz?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DnyJHW1XUAMNIY-?format=jpg&name=small)  
-
+<table>
+<tr>
+ <th>'Power of Connected' Hackathon by Honeywell.</th>
+ <th>'India stack on Azure' by Microsoft and Accenture.</th>
+ <th>PowerUp Automation Hackathon by UiPath</th>
+</tr>
+<tr>
+ <td><img src="https://pbs.twimg.com/media/DB-rG6YUAAAJXyE?format=jpg&name=small"/></td>
+ <td><img src="https://pbs.twimg.com/media/DB-rGE_U0AASmkz?format=jpg&name=small"/></td>
+ <td><img src="https://pbs.twimg.com/media/DnyJHW1XUAMNIY-?format=jpg&name=small"/></td>  
+</tr>
+</table>
+ 
 
 ## Find me on
 
