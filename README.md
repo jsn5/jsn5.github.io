@@ -3,18 +3,26 @@
 <img src="https://avatars3.githubusercontent.com/u/4473110?s=460&v=4" alt="Profile" width="150px" style="border:10px;border-radius:100px" />
 
 
-<h3>Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I work mostly on deep learning and computer vision applications. Tinkering with Raspberry Pi, opensource ML projects or attending hackathons when not working. </h3> 
+<b>Hi! I'm Jaison Saji Chacko, an ML Engineer from India. I work mostly on deep learning and computer vision applications. Tinkering with Raspberry Pi, opensource ML projects or attending hackathons when not working. </b> 
 
 
 ## Open Source Projects
 
 ### DanceNet
-![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif ) ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif )
+
+1                          |  2
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo.gif )  |  ![](https://raw.githubusercontent.com/jsn5/dancenet/master/demo2.gif )
+ 
 <br/>
 Dance generator using Autoencoder, LSTM and Mixture Density Network. (Keras). [Github](https://github.com/jsn5/dancenet)
 
+### DrivePi
+<img src="https://pbs.twimg.com/media/DsOlTleX4AE6WsX?format=jpg" height="300px" width="600px" alt="DrivePi" />
+A self-driving (toy) car built using Raspberry Pi, Keras and Floyhub GPUs. (In progress) [Blog series](https://blog.floydhub.com/toy-self-driving-car-part-one/)
+
 ### PyTuxCart
-<img src="https://raw.githubusercontent.com/jsn5/pytuxkart/master/gameai.gif" alt="PytuxKart">
+<img src="https://raw.githubusercontent.com/jsn5/pytuxkart/master/gameai.gif" alt="PytuxKart" />
 <br/>
 A self driving AI trained to play superTuxCart (a linux variant of Super Mario Kart). [Github](https://github.com/jsn5/pytuxkart)
 
@@ -24,10 +32,10 @@ Semantic image annotation using convolutional neural network.[Paper](https://www
 
 
 ## Achievements
+'Power of Connected' Hackathon by Honeywell.|  'India stack on Azure' by Microsoft and Accenture. | PowerUp Automation Hackathon by UiPath
+:-------------------------:|:-------------------------:|:-------------------------:
+![](https://pbs.twimg.com/media/DB-rG6YUAAAJXyE?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DB-rGE_U0AASmkz?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DnyJHW1XUAMNIY-?format=jpg&name=small)  
 
-- Winner of 'Power of Connected' Hackathon by Honeywell.
-- Winner of 'India stack on Azure' by Microsoft and Accenture.
-- Winner of 'Most Disruptive Idea', PowerUp Automation Hackathon by UiPath.
 
 ## Find me on
 
