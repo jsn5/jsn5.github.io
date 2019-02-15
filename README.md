@@ -40,12 +40,12 @@ A self driving AI trained to play superTuxCart (a linux variant of Super Mario K
 Semantic image annotation using convolutional neural network.[Paper](https://www.sciencepubco.com/index.php/ijet/article/view/9886/0)
 <hr/>
 
-## Achievements
+## Hackathon Highlights
 
 <table>
 <tr>
+ <th>'India stack on Azure' Hackathon by Microsoft and Accenture.</th>
  <th>'Power of Connected' Hackathon by Honeywell.</th>
- <th>'India stack on Azure' by Microsoft and Accenture.</th>
  <th>PowerUp Automation Hackathon by UiPath</th>
 </tr>
 <tr>
