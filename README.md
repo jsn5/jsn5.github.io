@@ -32,7 +32,7 @@ Semantic image annotation using convolutional neural network.[Paper](https://www
 
 
 ## Achievements
-'Power of Connected' Hackathon by Honeywell.|  'India stack on Azure' by Microsoft and Accenture. | PowerUp Automation Hackathon by UiPath
+'Power of Connected' Hackathon by Honeywell.|'India stack on Azure' by Microsoft and Accenture.|PowerUp Automation Hackathon by UiPath
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](https://pbs.twimg.com/media/DB-rG6YUAAAJXyE?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DB-rGE_U0AASmkz?format=jpg&name=small) | ![](https://pbs.twimg.com/media/DnyJHW1XUAMNIY-?format=jpg&name=small)  
 
