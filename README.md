@@ -11,7 +11,6 @@
  </tr>
 </table>
 
-<hr/>
 
 ## Open Source Projects
 
@@ -56,10 +55,3 @@ Semantic image annotation using convolutional neural network.[Paper](https://www
 </tr>
 </table>
 <hr/>
-
-## Find me on
-
-- [Twitter](https://twitter.com/jaisonsaji)
-- [LinkedIn](https://www.linkedin.com/in/jaisonsaji/)
-- [Medium](https://medium.com/@jaisonsaji)
-
