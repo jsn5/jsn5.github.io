@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes & Tutorials</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .post-list { list-style: none; }
+        .post-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
+        .post-item:last-child { border-bottom: none; }
+        .post-item a { text-decoration: none; color: inherit; display: block; }
+        .post-item a:hover .post-title { color: var(--accent); }
+        .post-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; transition: color 0.15s ease; }
+        .post-description { color: var(--text-muted); font-size: 15px; margin-bottom: 12px; line-height: 1.6; }
+        .post-meta { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); align-items: center; }
+        .post-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 4px; background: var(--accent-light); color: var(--accent); }
+        .post-tag.essay { background: var(--blue-light); color: var(--blue); }
+        .intro { font-size: 17px; color: var(--text-muted); margin-bottom: 40px; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+        .back-link:hover {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Notes & Tutorials</h1>
+            <p class="subtitle">by <a href="index.html">Jaison Saji Chacko</a></p>
+        </header>
+
+        <p class="intro">A collection of interactive tutorials and essays. Each builds from first principles with visualizations you can play with.</p>
+
+        <ul class="post-list">
+            <li class="post-item">
+                <a href="posts/mdn.html">
+                    <div class="post-title">Mixture Density Networks</div>
+                    <div class="post-description">Why standard regression fails on inverse problems, and how MDNs fix it by outputting distributions instead of point estimates.</div>
+                    <div class="post-meta">
+                        <span class="post-tag">Tutorial</span>
+                        <span>Interactive</span>
+                        <span>~15 min</span>
+                    </div>
+                </a>
+            </li>
+
+            <li class="post-item">
+                <a href="posts/entropy.html">
+                    <div class="post-title">Information Theory for ML</div>
+                    <div class="post-description">From bits to loss functions: why cross-entropy works. Building surprise, entropy, and KL divergence from scratch.</div>
+                    <div class="post-meta">
+                        <span class="post-tag">Tutorial</span>
+                        <span>Interactive</span>
+                        <span>~10 min</span>
+                    </div>
+                </a>
+            </li>
+
+            <li class="post-item">
+                <a href="posts/human-capabilities.html">
+                    <div class="post-title">Human Capabilities</div>
+                    <div class="post-description">On learning, memory, and the quiet machinery of mastery. How deliberate practice transforms System 2 into System 1.</div>
+                    <div class="post-meta">
+                        <span class="post-tag essay">Essay</span>
+                        <span>~5 min</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+
+        <footer>
+            <p>Built with HTML, CSS, and vanilla JavaScript.</p>
+        </footer>
+    </div>
+</body>
+</html>

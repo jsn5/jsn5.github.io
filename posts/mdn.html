@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixture Density Networks</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    
+    <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+    <div class="container">
+        <nav style="margin-bottom: 24px;">
+            <a href="../index.html" style="font-size: 14px; color: var(--text-muted);">← All posts</a>
+        </nav>
+
+        <header>
+            <p class="section-label">Tutorial</p>
+            <h1>Mixture Density Networks</h1>
+            <p class="subtitle">Why standard regression collapses on inverse problems</p>
+        </header>
+
+        <article>
+            <p>Standard neural networks predict a single output for a given input. That assumption is rarely questioned until you try to invert a function.</p>
+            
+            <p>This tutorial shows exactly where and why that assumption breaks, and how Mixture Density Networks (MDNs) fix it by modeling distributions, not point estimates.</p>
+
+            <h2>Part 1: The Forward Problem</h2>
+            <p class="section-label">Everything works</p>
+            
+            <p>Start with a function that is slightly nonlinear but well-behaved:</p>
+
+            <div class="equation-block">
+                <span class="equation-label">Forward Function</span>
+                $$y = x + 0.3 \sin(2\pi x) + \epsilon$$
+                <div class="equation-explanation">
+                    where $\epsilon \sim \text{Uniform}(-0.1, 0.1)$ is small random noise.
+                </div>
+            </div>
+
+            <p>For each input $x$, there is essentially one valid output $y$. That means $p(y|x)$ is <strong>unimodal</strong>, the conditional mean $\mathbb{E}[y|x]$ is meaningful, and MSE is a valid objective.</p>
+
+            <div class="visualization">
+                <div class="viz-header">
+                    <span class="viz-title">Forward Problem: y = f(x)</span>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--success);"></div><span>Data</span></div>
+                        <div class="legend-item"><div class="legend-line" style="background: var(--accent);"></div><span>MLP</span></div>
+                    </div>
+                </div>
+                <div class="viz-canvas-container"><canvas id="forwardCanvas" width="660" height="280"></canvas></div>
+                <div class="viz-stats">
+                    <div class="stat-item"><span class="stat-label">Epoch:</span><span class="stat-value" id="forwardEpoch">0</span></div>
+                    <div class="stat-item"><span class="stat-label">MSE:</span><span class="stat-value" id="forwardLoss">-</span></div>
+                    <div class="stat-item"><span class="stat-label">Status:</span><span class="stat-value" id="forwardStatus">Ready</span></div>
+                </div>
+                <div class="viz-controls">
+                    <button id="trainForward" class="success">Train MLP</button>
+                    <button id="resetForward" class="secondary">Reset</button>
+                    <div class="progress-bar" style="flex: 1; max-width: 200px;"><div class="progress-fill" id="forwardProgress" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-title">Result</div>
+                <p>A plain MLP trained with MSE converges cleanly. The network learns $\mathbb{E}[y|x]$.</p>
+            </div>
+
+            <h2>Part 2: The Inverse Problem</h2>
+            <p class="section-label">Where it breaks</p>
+
+            <p>Now swap the axes. Same data, different question:</p>
+
+            <div class="equation-block">
+                <span class="equation-label">The Inversion</span>
+                $$\text{Forward: } y = f(x) \quad \longrightarrow \quad \text{Inverse: } x = f^{-1}(y)$$
+                <div class="equation-explanation">
+                    Given $y$, what was $x$? This is no longer well-posed.
+                </div>
+            </div>
+
+            <p>Because the forward function is non-monotonic, multiple $x$ values map to the same $y$. Now $p(x|y)$ is <strong>multi-modal</strong> and the conditional mean lies between valid solutions.</p>
+
+            <div class="visualization">
+                <div class="viz-header">
+                    <span class="viz-title">Inverse Problem: x = f⁻¹(y)</span>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: rgba(26,26,26,0.5);"></div><span>Data</span></div>
+                        <div class="legend-item"><div class="legend-line" style="background: var(--accent);"></div><span>MLP</span></div>
+                    </div>
+                </div>
+                <div class="viz-canvas-container"><canvas id="inverseCanvas" width="660" height="280"></canvas></div>
+                <div class="viz-stats">
+                    <div class="stat-item"><span class="stat-label">Epoch:</span><span class="stat-value" id="inverseEpoch">0</span></div>
+                    <div class="stat-item"><span class="stat-label">MSE:</span><span class="stat-value" id="inverseLoss">-</span></div>
+                    <div class="stat-item"><span class="stat-label">Status:</span><span class="stat-value" id="inverseStatus">Ready</span></div>
+                </div>
+                <div class="viz-controls">
+                    <button id="trainInverse">Train MLP</button>
+                    <button id="resetInverse" class="secondary">Reset</button>
+                    <div class="progress-bar" style="flex: 1; max-width: 200px;"><div class="progress-fill" id="inverseProgress" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="callout accent">
+                <div class="callout-title">Result</div>
+                <p>The MLP produces $\mathbb{E}[x \mid y]$, a curve through empty space. This is a <strong>loss-model mismatch</strong>.</p>
+            </div>
+
+            <div class="callout blue">
+                <div class="callout-title">This shows up everywhere</div>
+                <p>Inverse kinematics, vision (depth ambiguity), physics (cause from effect), control and planning. If your data has multiple valid outputs, point regression is wrong.</p>
+            </div>
+
+            <h2>Part 3: What MDNs Change</h2>
+            <p class="section-label">Distributions, not points</p>
+
+            <p>MDNs do not make the network more powerful. They change what it represents: parameters of a conditional distribution instead of a single value.</p>
+
+            <div class="equation-block hero">
+                <span class="equation-label">Gaussian Mixture Model</span>
+                $$p(x \mid y) = \sum_{k=1}^{K} \pi_k(y) \cdot \mathcal{N}\big(x \mid \mu_k(y), \sigma_k(y)\big)$$
+            </div>
+
+            <p>Each input $y$ produces K candidate solutions. Each has a probability mass. The Σ is just a loop:</p>
+
+            <div class="code-breakdown">
+                <div class="code-breakdown-header"><span class="title">gmm_probability.py</span><span class="lang">python</span></div>
+<pre><span class="keyword">def</span> <span class="function">gmm_probability</span>(<span class="variable">x</span>, <span class="variable">y</span>, <span class="variable">net</span>):
+    <span class="variable">pi</span>, <span class="variable">mu</span>, <span class="variable">sigma</span> = <span class="variable">net</span>.<span class="function">forward</span>(<span class="variable">y</span>)
+<span class="highlight-line">    <span class="variable">total</span> = <span class="number">0</span></span>
+<span class="highlight-line">    <span class="keyword">for</span> <span class="variable">k</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">K</span>): <span class="variable">total</span> += <span class="variable">pi</span>[<span class="variable">k</span>] * <span class="function">normal_pdf</span>(<span class="variable">x</span>, <span class="variable">mu</span>[<span class="variable">k</span>], <span class="variable">sigma</span>[<span class="variable">k</span>])</span>
+    <span class="keyword">return</span> <span class="variable">total</span></pre>
+            </div>
+
+            <h3>Output Transformations</h3>
+
+            <div class="param-grid">
+                <div class="param-card">
+                    <div class="param-symbol">π<sub>k</sub></div>
+                    <div class="param-desc">Mixing weights<br><small>softmax → sum to 1</small></div>
+                </div>
+                <div class="param-card">
+                    <div class="param-symbol">μ<sub>k</sub></div>
+                    <div class="param-desc">Means<br><small>raw output</small></div>
+                </div>
+                <div class="param-card">
+                    <div class="param-symbol">σ<sub>k</sub></div>
+                    <div class="param-desc">Std deviations<br><small>exp → always positive</small></div>
+                </div>
+            </div>
+
+            <h3>The Loss: Negative Log-Likelihood</h3>
+
+            <div class="equation-block">
+                <span class="equation-label">NLL Loss</span>
+                $$\mathcal{L} = -\log p(x \mid y) = -\log \sum_{k=1}^{K} \pi_k \cdot \mathcal{N}(x \mid \mu_k, \sigma_k)$$
+                <div class="equation-explanation">
+                    Maximize the probability the model assigns to the true target. Works for multi-modal distributions.
+                </div>
+            </div>
+
+            <div class="visualization">
+                <div class="viz-header">
+                    <span class="viz-title">MDN on Inverse Problem</span>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: rgba(26,26,26,0.5);"></div><span>Data</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--success);"></div><span>Samples</span></div>
+                    </div>
+                </div>
+                <div class="viz-canvas-container"><canvas id="mdnCanvas" width="660" height="280"></canvas></div>
+                <div class="viz-stats">
+                    <div class="stat-item"><span class="stat-label">Epoch:</span><span class="stat-value" id="mdnEpoch">0</span></div>
+                    <div class="stat-item"><span class="stat-label">NLL:</span><span class="stat-value" id="mdnLoss">-</span></div>
+                    <div class="stat-item"><span class="stat-label">Status:</span><span class="stat-value" id="mdnStatus">Ready</span></div>
+                </div>
+                <div class="viz-controls">
+                    <button id="trainMDN" class="success">Train MDN</button>
+                    <button id="sampleMDN" class="secondary">Sample</button>
+                    <button id="resetMDN" class="secondary">Reset</button>
+                    <div class="progress-bar" style="flex: 1; max-width: 200px;"><div class="progress-fill" id="mdnProgress" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-title">Result</div>
+                <p>The MDN captures multiple modes. Samples follow the data distribution, not the mean.</p>
+            </div>
+
+            <h2>Playground</h2>
+            <p class="section-label">Draw your own</p>
+            
+            <p>Draw a distribution and compare MLP vs MDN:</p>
+
+            <div class="visualization">
+                <div class="viz-header">
+                    <span class="viz-title">Draw Your Own Distribution</span>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: rgba(26,26,26,0.7);"></div><span>Data</span></div>
+                        <div class="legend-item"><div class="legend-line" style="background: #c45d4a;"></div><span>MLP</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--success);"></div><span>MDN Samples</span></div>
+                    </div>
+                </div>
+                <div class="viz-canvas-container"><canvas id="playgroundCanvas" width="660" height="320"></canvas></div>
+                <div class="viz-stats">
+                    <div class="stat-item"><span class="stat-label">Points:</span><span class="stat-value" id="playgroundPoints">0</span></div>
+                    <div class="stat-item"><span class="stat-label">Epoch:</span><span class="stat-value" id="playgroundEpoch">0</span></div>
+                    <div class="stat-item"><span class="stat-label">Loss:</span><span class="stat-value" id="playgroundLoss">-</span></div>
+                    <div class="stat-item"><span class="stat-label">Status:</span><span class="stat-value" id="playgroundStatus">Draw points</span></div>
+                </div>
+                <div class="viz-controls">
+                    <button id="trainPlaygroundMLP">Train MLP</button>
+                    <button id="trainPlayground" class="success">Train MDN</button>
+                    <button id="samplePlayground" class="secondary">Sample</button>
+                    <button id="clearPlayground" class="secondary">Clear</button>
+                    <div class="slider-container" style="margin-left: 12px;">
+                        <span class="slider-label">K:</span>
+                        <select id="playgroundK" style="font-family: inherit; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px;">
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="5">5</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h2>The Takeaway</h2>
+
+            <div class="code-breakdown">
+                <div class="code-breakdown-header"><span class="title">summary.py</span><span class="lang">python</span></div>
+<pre><span class="comment"># MLP: single output</span>
+<span class="variable">y_pred</span> = <span class="variable">network</span>(<span class="variable">x</span>)  <span class="comment"># point estimate</span>
+<span class="variable">loss</span> = <span class="function">mse</span>(<span class="variable">y_pred</span>, <span class="variable">y_true</span>)
+
+<span class="comment"># MDN: distribution parameters</span>
+<span class="variable">pi</span>, <span class="variable">mu</span>, <span class="variable">sigma</span> = <span class="variable">network</span>(<span class="variable">x</span>)  <span class="comment"># K components</span>
+<span class="variable">p</span> = <span class="function">sum</span>(<span class="variable">pi</span>[<span class="variable">k</span>] * <span class="function">gaussian</span>(<span class="variable">y</span>, <span class="variable">mu</span>[<span class="variable">k</span>], <span class="variable">sigma</span>[<span class="variable">k</span>]) <span class="keyword">for</span> <span class="variable">k</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">K</span>))
+<span class="variable">loss</span> = -<span class="function">log</span>(<span class="variable">p</span>)  <span class="comment"># NLL</span></pre>
+            </div>
+
+            <p>MDNs are not magic. They change what the network is allowed to output. When your conditional distribution is multi-modal, that change is necessary.</p>
+
+        </article>
+
+        <footer>
+            <p>Neural networks implemented in vanilla JavaScript.</p>
+        </footer>
+    </div>
+
+<script src="../js/utils.js"></script>
+<script>
+// ================================================================
+// MLP CLASS
+// ================================================================
+class MLP {
+    constructor(inp, hid, out) {
+        const s1 = Math.sqrt(6.0 / (inp + hid)) * 2;
+        const s2 = Math.sqrt(6.0 / (hid + hid));
+        const s3 = Math.sqrt(6.0 / (hid + out));
+        this.W1 = Matrix.random(inp, hid, s1); this.b1 = Matrix.zeros(1, hid);
+        this.W2 = Matrix.random(hid, hid, s2); this.b2 = Matrix.zeros(1, hid);
+        this.W3 = Matrix.random(hid, out, s3); this.b3 = Matrix.zeros(1, out);
+        for (let j = 0; j < hid; j++) this.b1.set(0, j, (Math.random() - 0.5) * 2);
+        this.xMean = 0; this.xStd = 1; this.yMean = 0; this.yStd = 1;
+    }
+    setNorm(xMean, xStd, yMean, yStd) { this.xMean = xMean; this.xStd = xStd; this.yMean = yMean; this.yStd = yStd; }
+    tanh(m) { const r = new Matrix(m.rows, m.cols); for (let i = 0; i < m.data.length; i++) r.data[i] = Math.tanh(m.data[i]); return r; }
+    tanhD(m) { const r = new Matrix(m.rows, m.cols); for (let i = 0; i < m.data.length; i++) { const t = Math.tanh(m.data[i]); r.data[i] = 1 - t * t; } return r; }
+    forward(X) {
+        this.X = new Matrix(X.rows, X.cols);
+        for (let i = 0; i < X.rows; i++) this.X.set(i, 0, (X.get(i, 0) - this.xMean) / this.xStd);
+        this.z1 = Matrix.matmul(this.X, this.W1).addBias(this.b1); this.a1 = this.tanh(this.z1);
+        this.z2 = Matrix.matmul(this.a1, this.W2).addBias(this.b2); this.a2 = this.tanh(this.z2);
+        this.z3 = Matrix.matmul(this.a2, this.W3).addBias(this.b3);
+        return this.z3;
+    }
+    had(a, b) { const r = new Matrix(a.rows, a.cols); for (let i = 0; i < a.data.length; i++) r.data[i] = a.data[i] * b.data[i]; return r; }
+    sumR(m) { const r = Matrix.zeros(1, m.cols); for (let i = 0; i < m.rows; i++) for (let j = 0; j < m.cols; j++) r.set(0, j, r.get(0, j) + m.get(i, j)); return r; }
+    clip(m, mx) { let n = 0; for (let i = 0; i < m.data.length; i++) n += m.data[i] * m.data[i]; n = Math.sqrt(n); return n > mx ? m.scale(mx / n) : m; }
+    backward(Y, lr) {
+        const Yn = new Matrix(Y.rows, Y.cols);
+        for (let i = 0; i < Y.rows; i++) Yn.set(i, 0, (Y.get(i, 0) - this.yMean) / this.yStd);
+        const n = this.X.rows;
+        const dz3 = this.z3.sub(Yn);
+        let dW3 = Matrix.matmul(Matrix.transpose(this.a2), dz3).scale(1/n);
+        let db3 = this.sumR(dz3).scale(1/n);
+        const da2 = Matrix.matmul(dz3, Matrix.transpose(this.W3));
+        const dz2 = this.had(da2, this.tanhD(this.z2));
+        let dW2 = Matrix.matmul(Matrix.transpose(this.a1), dz2).scale(1/n);
+        let db2 = this.sumR(dz2).scale(1/n);
+        const da1 = Matrix.matmul(dz2, Matrix.transpose(this.W2));
+        const dz1 = this.had(da1, this.tanhD(this.z1));
+        let dW1 = Matrix.matmul(Matrix.transpose(this.X), dz1).scale(1/n);
+        let db1 = this.sumR(dz1).scale(1/n);
+        dW3 = this.clip(dW3, 5); dW2 = this.clip(dW2, 5); dW1 = this.clip(dW1, 5);
+        this.W3 = this.W3.sub(dW3.scale(lr)); this.b3 = this.b3.sub(db3.scale(lr));
+        this.W2 = this.W2.sub(dW2.scale(lr)); this.b2 = this.b2.sub(db2.scale(lr));
+        this.W1 = this.W1.sub(dW1.scale(lr)); this.b1 = this.b1.sub(db1.scale(lr));
+        let loss = 0;
+        for (let i = 0; i < n; i++) { const d = this.z3.get(i, 0) - Yn.get(i, 0); loss += d * d; }
+        return loss / n;
+    }
+    predict(x) {
+        const X = new Matrix(1, 1); X.set(0, 0, x);
+        const out = this.forward(X);
+        return out.get(0, 0) * this.yStd + this.yMean;
+    }
+}
+
+// ================================================================
+// MDN CLASS
+// ================================================================
+class MDN {
+    constructor(inp, hid, K) {
+        this.K = K;
+        const s1 = Math.sqrt(6.0 / (inp + hid)), s2 = Math.sqrt(6.0 / (hid + hid)), s3 = Math.sqrt(6.0 / (hid + 3*K)) * 0.5;
+        this.W1 = Matrix.random(inp, hid, s1); this.b1 = Matrix.zeros(1, hid);
+        this.W2 = Matrix.random(hid, hid, s2); this.b2 = Matrix.zeros(1, hid);
+        this.W3 = Matrix.random(hid, 3*K, s3); this.b3 = Matrix.zeros(1, 3*K);
+        for (let j = 0; j < hid; j++) this.b1.set(0, j, (Math.random() - 0.5) * 2);
+        this.xMean = 0; this.xStd = 1; this.yMean = 0; this.yStd = 1;
+    }
+    setNorm(xMean, xStd, yMean, yStd) { this.xMean = xMean; this.xStd = xStd; this.yMean = yMean; this.yStd = yStd; }
+    tanh(m) { const r = new Matrix(m.rows, m.cols); for (let i = 0; i < m.data.length; i++) r.data[i] = Math.tanh(m.data[i]); return r; }
+    tanhD(m) { const r = new Matrix(m.rows, m.cols); for (let i = 0; i < m.data.length; i++) { const t = Math.tanh(m.data[i]); r.data[i] = 1 - t * t; } return r; }
+    forward(X) {
+        this.X = new Matrix(X.rows, X.cols);
+        for (let i = 0; i < X.rows; i++) this.X.set(i, 0, (X.get(i, 0) - this.xMean) / this.xStd);
+        this.z1 = Matrix.matmul(this.X, this.W1).addBias(this.b1); this.a1 = this.tanh(this.z1);
+        this.z2 = Matrix.matmul(this.a1, this.W2).addBias(this.b2); this.a2 = this.tanh(this.z2);
+        this.z3 = Matrix.matmul(this.a2, this.W3).addBias(this.b3);
+        const n = X.rows, K = this.K;
+        this.pi = new Matrix(n, K); this.mu = new Matrix(n, K); this.sigma = new Matrix(n, K);
+        for (let i = 0; i < n; i++) {
+            let maxZ = -Infinity;
+            for (let k = 0; k < K; k++) maxZ = Math.max(maxZ, this.z3.get(i, k));
+            let sumExp = 0;
+            for (let k = 0; k < K; k++) sumExp += Math.exp(this.z3.get(i, k) - maxZ);
+            for (let k = 0; k < K; k++) this.pi.set(i, k, Math.exp(this.z3.get(i, k) - maxZ) / sumExp);
+            for (let k = 0; k < K; k++) this.mu.set(i, k, this.z3.get(i, K + k));
+            for (let k = 0; k < K; k++) {
+                const rawSig = this.z3.get(i, 2*K + k);
+                this.sigma.set(i, k, Math.exp(Math.max(-5, Math.min(5, rawSig))) + 0.01);
+            }
+        }
+        return { pi: this.pi, mu: this.mu, sigma: this.sigma };
+    }
+    gaussianPdf(x, mu, sigma) {
+        const z = (x - mu) / sigma;
+        return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+    }
+    had(a, b) { const r = new Matrix(a.rows, a.cols); for (let i = 0; i < a.data.length; i++) r.data[i] = a.data[i] * b.data[i]; return r; }
+    sumR(m) { const r = Matrix.zeros(1, m.cols); for (let i = 0; i < m.rows; i++) for (let j = 0; j < m.cols; j++) r.set(0, j, r.get(0, j) + m.get(i, j)); return r; }
+    clip(m, mx) { let n = 0; for (let i = 0; i < m.data.length; i++) n += m.data[i] * m.data[i]; n = Math.sqrt(n); return n > mx ? m.scale(mx / n) : m; }
+    backward(Y, lr) {
+        const Yn = new Matrix(Y.rows, Y.cols);
+        for (let i = 0; i < Y.rows; i++) Yn.set(i, 0, (Y.get(i, 0) - this.yMean) / this.yStd);
+        const n = this.X.rows, K = this.K;
+        const dz3 = new Matrix(n, 3*K);
+        let totalLoss = 0;
+        for (let i = 0; i < n; i++) {
+            const y = Yn.get(i, 0);
+            const gamma = new Float64Array(K);
+            let pTotal = 0;
+            for (let k = 0; k < K; k++) {
+                const pk = this.pi.get(i, k) * this.gaussianPdf(y, this.mu.get(i, k), this.sigma.get(i, k));
+                gamma[k] = pk; pTotal += pk;
+            }
+            pTotal = Math.max(pTotal, 1e-10);
+            for (let k = 0; k < K; k++) gamma[k] /= pTotal;
+            totalLoss += -Math.log(Math.max(pTotal, 1e-10));
+            for (let k = 0; k < K; k++) dz3.set(i, k, this.pi.get(i, k) - gamma[k]);
+            for (let k = 0; k < K; k++) {
+                const diff = this.mu.get(i, k) - y;
+                const sig = this.sigma.get(i, k);
+                dz3.set(i, K + k, gamma[k] * diff / (sig * sig));
+            }
+            for (let k = 0; k < K; k++) {
+                const diff = this.mu.get(i, k) - y;
+                const sig = this.sigma.get(i, k);
+                dz3.set(i, 2*K + k, gamma[k] * (1 - (diff * diff) / (sig * sig)));
+            }
+        }
+        let dW3 = Matrix.matmul(Matrix.transpose(this.a2), dz3).scale(1/n);
+        let db3 = this.sumR(dz3).scale(1/n);
+        const da2 = Matrix.matmul(dz3, Matrix.transpose(this.W3));
+        const dz2 = this.had(da2, this.tanhD(this.z2));
+        let dW2 = Matrix.matmul(Matrix.transpose(this.a1), dz2).scale(1/n);
+        let db2 = this.sumR(dz2).scale(1/n);
+        const da1 = Matrix.matmul(dz2, Matrix.transpose(this.W2));
+        const dz1 = this.had(da1, this.tanhD(this.z1));
+        let dW1 = Matrix.matmul(Matrix.transpose(this.X), dz1).scale(1/n);
+        let db1 = this.sumR(dz1).scale(1/n);
+        dW3 = this.clip(dW3, 5); dW2 = this.clip(dW2, 5); dW1 = this.clip(dW1, 5);
+        this.W3 = this.W3.sub(dW3.scale(lr)); this.b3 = this.b3.sub(db3.scale(lr));
+        this.W2 = this.W2.sub(dW2.scale(lr)); this.b2 = this.b2.sub(db2.scale(lr));
+        this.W1 = this.W1.sub(dW1.scale(lr)); this.b1 = this.b1.sub(db1.scale(lr));
+        return totalLoss / n;
+    }
+    getParams(x) {
+        const X = new Matrix(1, 1); X.set(0, 0, x);
+        const { pi, mu, sigma } = this.forward(X);
+        const result = [];
+        for (let k = 0; k < this.K; k++) {
+            result.push({ pi: pi.get(0, k), mu: mu.get(0, k) * this.yStd + this.yMean, sigma: sigma.get(0, k) * this.yStd });
+        }
+        return result;
+    }
+    sample(x) {
+        const params = this.getParams(x);
+        let r = Math.random(), cumsum = 0, chosen = 0;
+        for (let k = 0; k < params.length; k++) { cumsum += params[k].pi; if (r < cumsum) { chosen = k; break; } }
+        const u1 = Math.random(), u2 = Math.random();
+        const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+        return params[chosen].mu + params[chosen].sigma * z;
+    }
+    density(x, y) {
+        const params = this.getParams(x);
+        let p = 0;
+        for (const c of params) p += c.pi * this.gaussianPdf(y, c.mu, c.sigma);
+        return p;
+    }
+}
+
+// ================================================================
+// DATA GENERATION
+// ================================================================
+function generateData(n = 500) {
+    const forward = [], inverse = [];
+    for (let i = 0; i < n; i++) {
+        const x = Math.random();
+        const y = x + 0.3 * Math.sin(2 * Math.PI * x) + (Math.random() - 0.5) * 0.2;
+        forward.push({ x, y });
+        inverse.push({ x: y, y: x });
+    }
+    return { forward, inverse };
+}
+
+const { forward: forwardData, inverse: inverseData } = generateData();
+const forwardBounds = { xMin: -0.1, xMax: 1.1, yMin: -0.2, yMax: 1.4 };
+const inverseBounds = { xMin: -0.2, xMax: 1.4, yMin: -0.1, yMax: 1.1 };
+
+let forwardMLP = null, inverseMLP = null, mdnModel = null;
+let forwardTrained = false, inverseTrained = false, mdnTrained = false;
+let mdnSamples = [];
+
+// ================================================================
+// CANVAS HELPERS
+// ================================================================
+function clear(ctx, c) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); }
+function toC(x, y, c, xMin, xMax, yMin, yMax) {
+    const pad = 40;
+    const cx = pad + (x - xMin) / (xMax - xMin) * (c.width - 2 * pad);
+    const cy = pad + (1 - (y - yMin) / (yMax - yMin)) * (c.height - 2 * pad);
+    return { cx, cy };
+}
+function axes(ctx, c, xLbl, yLbl) {
+    const pad = 40;
+    ctx.strokeStyle = '#e5e4e2'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, pad); ctx.lineTo(pad, c.height - pad); ctx.lineTo(c.width - pad, c.height - pad);
+    ctx.stroke();
+    ctx.fillStyle = '#6b7280'; ctx.font = '12px Inter'; ctx.textAlign = 'center';
+    ctx.fillText(xLbl, c.width / 2, c.height - 10);
+    ctx.save(); ctx.translate(15, c.height / 2); ctx.rotate(-Math.PI / 2); ctx.fillText(yLbl, 0, 0); ctx.restore();
+}
+function drawPts(ctx, c, pts, col, r, xMin, xMax, yMin, yMax) {
+    ctx.fillStyle = col;
+    for (const p of pts) { const { cx, cy } = toC(p.x, p.y, c, xMin, xMax, yMin, yMax); ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.fill(); }
+}
+
+// ================================================================
+// DRAW FUNCTIONS
+// ================================================================
+const forwardC = document.getElementById('forwardCanvas'), forwardCtx = forwardC.getContext('2d');
+const inverseC = document.getElementById('inverseCanvas'), inverseCtx = inverseC.getContext('2d');
+const mdnC = document.getElementById('mdnCanvas'), mdnCtx = mdnC.getContext('2d');
+
+function drawForward() {
+    clear(forwardCtx, forwardC); axes(forwardCtx, forwardC, 'x', 'y');
+    const b = forwardBounds;
+    drawPts(forwardCtx, forwardC, forwardData, 'rgba(45,125,70,0.5)', 3, b.xMin, b.xMax, b.yMin, b.yMax);
+    if (forwardTrained && forwardMLP) {
+        forwardCtx.strokeStyle = '#c45d4a'; forwardCtx.lineWidth = 2.5; forwardCtx.beginPath();
+        for (let px = 0; px <= 100; px++) {
+            const x = b.xMin + (px / 100) * (b.xMax - b.xMin);
+            const y = forwardMLP.predict(x);
+            const { cx, cy } = toC(x, y, forwardC, b.xMin, b.xMax, b.yMin, b.yMax);
+            px === 0 ? forwardCtx.moveTo(cx, cy) : forwardCtx.lineTo(cx, cy);
+        }
+        forwardCtx.stroke();
+    }
+}
+
+function drawInverse() {
+    clear(inverseCtx, inverseC); axes(inverseCtx, inverseC, 'y', 'x');
+    const b = inverseBounds;
+    drawPts(inverseCtx, inverseC, inverseData, 'rgba(26,26,26,0.4)', 3, b.xMin, b.xMax, b.yMin, b.yMax);
+    if (inverseTrained && inverseMLP) {
+        inverseCtx.strokeStyle = '#c45d4a'; inverseCtx.lineWidth = 2.5; inverseCtx.beginPath();
+        for (let px = 0; px <= 100; px++) {
+            const x = b.xMin + (px / 100) * (b.xMax - b.xMin);
+            const y = inverseMLP.predict(x);
+            const { cx, cy } = toC(x, y, inverseC, b.xMin, b.xMax, b.yMin, b.yMax);
+            px === 0 ? inverseCtx.moveTo(cx, cy) : inverseCtx.lineTo(cx, cy);
+        }
+        inverseCtx.stroke();
+    }
+}
+
+function drawMDN() {
+    clear(mdnCtx, mdnC); axes(mdnCtx, mdnC, 'y', 'x');
+    const b = inverseBounds;
+    if (mdnTrained && mdnModel) {
+        const res = 60;
+        for (let i = 0; i < res; i++) {
+            for (let j = 0; j < res; j++) {
+                const x = b.xMin + (i / res) * (b.xMax - b.xMin);
+                const y = b.yMin + (j / res) * (b.yMax - b.yMin);
+                const d = mdnModel.density(x, y);
+                const alpha = Math.min(d * 1.5, 1);
+                if (alpha > 0.02) {
+                    const { cx, cy } = toC(x, y, mdnC, b.xMin, b.xMax, b.yMin, b.yMax);
+                    mdnCtx.fillStyle = `rgba(196,93,74,${alpha})`;
+                    mdnCtx.fillRect(cx - 4, cy - 4, 8, 8);
+                }
+            }
+        }
+    }
+    drawPts(mdnCtx, mdnC, inverseData, 'rgba(26,26,26,0.35)', 3, b.xMin, b.xMax, b.yMin, b.yMax);
+    if (mdnSamples.length > 0) drawPts(mdnCtx, mdnC, mdnSamples, 'rgba(45,125,70,0.7)', 4, b.xMin, b.xMax, b.yMin, b.yMax);
+}
+
+// ================================================================
+// TRAINING
+// ================================================================
+async function trainForwardFn() {
+    const xs = forwardData.map(p => p.x), ys = forwardData.map(p => p.y);
+    const xMean = xs.reduce((a,b)=>a+b,0)/xs.length, yMean = ys.reduce((a,b)=>a+b,0)/ys.length;
+    const xStd = Math.sqrt(xs.reduce((s,x)=>s+(x-xMean)**2,0)/xs.length) || 1;
+    const yStd = Math.sqrt(ys.reduce((s,y)=>s+(y-yMean)**2,0)/ys.length) || 1;
+    forwardMLP = new MLP(1, 32, 1);
+    forwardMLP.setNorm(xMean, xStd, yMean, yStd);
+    const X = new Matrix(xs.length, 1), Y = new Matrix(ys.length, 1);
+    for (let i = 0; i < xs.length; i++) { X.set(i, 0, xs[i]); Y.set(i, 0, ys[i]); }
+    const epochs = 800, lr = 0.1;
+    document.getElementById('forwardStatus').textContent = 'Training...';
+    for (let e = 0; e < epochs; e++) {
+        forwardMLP.forward(X);
+        const loss = forwardMLP.backward(Y, lr);
+        if (e % 20 === 0 || e === epochs - 1) {
+            document.getElementById('forwardEpoch').textContent = e + 1;
+            document.getElementById('forwardLoss').textContent = loss.toFixed(4);
+            document.getElementById('forwardProgress').style.width = ((e + 1) / epochs * 100) + '%';
+            forwardTrained = true; drawForward();
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+    document.getElementById('forwardStatus').textContent = 'Done';
+}
+
+async function trainInverseFn() {
+    const xs = inverseData.map(p => p.x), ys = inverseData.map(p => p.y);
+    const xMean = xs.reduce((a,b)=>a+b,0)/xs.length, yMean = ys.reduce((a,b)=>a+b,0)/ys.length;
+    const xStd = Math.sqrt(xs.reduce((s,x)=>s+(x-xMean)**2,0)/xs.length) || 1;
+    const yStd = Math.sqrt(ys.reduce((s,y)=>s+(y-yMean)**2,0)/ys.length) || 1;
+    inverseMLP = new MLP(1, 32, 1);
+    inverseMLP.setNorm(xMean, xStd, yMean, yStd);
+    const X = new Matrix(xs.length, 1), Y = new Matrix(ys.length, 1);
+    for (let i = 0; i < xs.length; i++) { X.set(i, 0, xs[i]); Y.set(i, 0, ys[i]); }
+    const epochs = 800, lr = 0.1;
+    document.getElementById('inverseStatus').textContent = 'Training...';
+    for (let e = 0; e < epochs; e++) {
+        inverseMLP.forward(X);
+        const loss = inverseMLP.backward(Y, lr);
+        if (e % 20 === 0 || e === epochs - 1) {
+            document.getElementById('inverseEpoch').textContent = e + 1;
+            document.getElementById('inverseLoss').textContent = loss.toFixed(4);
+            document.getElementById('inverseProgress').style.width = ((e + 1) / epochs * 100) + '%';
+            inverseTrained = true; drawInverse();
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+    document.getElementById('inverseStatus').textContent = 'Done';
+}
+
+async function trainMDNFn() {
+    const xs = inverseData.map(p => p.x), ys = inverseData.map(p => p.y);
+    const xMean = xs.reduce((a,b)=>a+b,0)/xs.length, yMean = ys.reduce((a,b)=>a+b,0)/ys.length;
+    const xStd = Math.sqrt(xs.reduce((s,x)=>s+(x-xMean)**2,0)/xs.length) || 1;
+    const yStd = Math.sqrt(ys.reduce((s,y)=>s+(y-yMean)**2,0)/ys.length) || 1;
+    mdnModel = new MDN(1, 32, 3);
+    mdnModel.setNorm(xMean, xStd, yMean, yStd);
+    const X = new Matrix(xs.length, 1), Y = new Matrix(ys.length, 1);
+    for (let i = 0; i < xs.length; i++) { X.set(i, 0, xs[i]); Y.set(i, 0, ys[i]); }
+    const epochs = 1200, lr = 0.05;
+    document.getElementById('mdnStatus').textContent = 'Training...';
+    mdnSamples = [];
+    for (let e = 0; e < epochs; e++) {
+        mdnModel.forward(X);
+        const loss = mdnModel.backward(Y, lr);
+        if (e % 30 === 0 || e === epochs - 1) {
+            document.getElementById('mdnEpoch').textContent = e + 1;
+            document.getElementById('mdnLoss').textContent = loss.toFixed(3);
+            document.getElementById('mdnProgress').style.width = ((e + 1) / epochs * 100) + '%';
+            mdnTrained = true; drawMDN();
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+    document.getElementById('mdnStatus').textContent = 'Done';
+}
+
+// ================================================================
+// EVENT LISTENERS
+// ================================================================
+document.getElementById('trainForward').addEventListener('click', async function() {
+    this.disabled = true; await trainForwardFn(); this.disabled = false;
+});
+document.getElementById('resetForward').addEventListener('click', () => {
+    forwardMLP = null; forwardTrained = false;
+    document.getElementById('forwardEpoch').textContent = '0';
+    document.getElementById('forwardLoss').textContent = '-';
+    document.getElementById('forwardStatus').textContent = 'Ready';
+    document.getElementById('forwardProgress').style.width = '0%';
+    drawForward();
+});
+document.getElementById('trainInverse').addEventListener('click', async function() {
+    this.disabled = true; await trainInverseFn(); this.disabled = false;
+});
+document.getElementById('resetInverse').addEventListener('click', () => {
+    inverseMLP = null; inverseTrained = false;
+    document.getElementById('inverseEpoch').textContent = '0';
+    document.getElementById('inverseLoss').textContent = '-';
+    document.getElementById('inverseStatus').textContent = 'Ready';
+    document.getElementById('inverseProgress').style.width = '0%';
+    drawInverse();
+});
+document.getElementById('trainMDN').addEventListener('click', async function() {
+    this.disabled = true; await trainMDNFn(); this.disabled = false;
+});
+document.getElementById('sampleMDN').addEventListener('click', () => {
+    if (!mdnTrained || !mdnModel) return;
+    const b = inverseBounds;
+    mdnSamples = [];
+    for (let i = 0; i < 100; i++) {
+        const x = b.xMin + 0.1 + Math.random() * (b.xMax - b.xMin - 0.2);
+        const y = mdnModel.sample(x);
+        if (y > b.yMin && y < b.yMax) mdnSamples.push({ x, y });
+    }
+    drawMDN();
+});
+document.getElementById('resetMDN').addEventListener('click', () => {
+    mdnModel = null; mdnTrained = false; mdnSamples = [];
+    document.getElementById('mdnEpoch').textContent = '0';
+    document.getElementById('mdnLoss').textContent = '-';
+    document.getElementById('mdnStatus').textContent = 'Ready';
+    document.getElementById('mdnProgress').style.width = '0%';
+    drawMDN();
+});
+
+// ================================================================
+// PLAYGROUND
+// ================================================================
+const playC = document.getElementById('playgroundCanvas'), playCtx = playC.getContext('2d');
+let playgroundData = [], playgroundMLP = null, playgroundMDN = null;
+let playgroundTrained = false, playgroundMLPTrained = false, playgroundSamples = [];
+const playBounds = { xMin: 0, xMax: 1, yMin: 0, yMax: 1 };
+
+function drawPlayground() {
+    clear(playCtx, playC);
+    playCtx.strokeStyle = '#e5e4e2'; playCtx.lineWidth = 1;
+    playCtx.strokeRect(40, 40, playC.width - 80, playC.height - 80);
+    
+    if (playgroundTrained && playgroundMDN) {
+        const res = 50;
+        for (let i = 0; i < res; i++) {
+            for (let j = 0; j < res; j++) {
+                const x = (i / res);
+                const y = (j / res);
+                const d = playgroundMDN.density(x, y);
+                const alpha = Math.min(d * 2, 0.8);
+                if (alpha > 0.05) {
+                    const { cx, cy } = toC(x, y, playC, playBounds.xMin, playBounds.xMax, playBounds.yMin, playBounds.yMax);
+                    playCtx.fillStyle = `rgba(196,93,74,${alpha})`;
+                    playCtx.fillRect(cx - 5, cy - 5, 10, 10);
+                }
+            }
+        }
+    }
+    
+    if (playgroundMLPTrained && playgroundMLP) {
+        playCtx.strokeStyle = '#c45d4a'; playCtx.lineWidth = 2.5; playCtx.beginPath();
+        for (let px = 0; px <= 100; px++) {
+            const x = px / 100;
+            const y = playgroundMLP.predict(x);
+            const { cx, cy } = toC(x, y, playC, playBounds.xMin, playBounds.xMax, playBounds.yMin, playBounds.yMax);
+            px === 0 ? playCtx.moveTo(cx, cy) : playCtx.lineTo(cx, cy);
+        }
+        playCtx.stroke();
+    }
+    
+    drawPts(playCtx, playC, playgroundData, 'rgba(26,26,26,0.7)', 4, playBounds.xMin, playBounds.xMax, playBounds.yMin, playBounds.yMax);
+    if (playgroundSamples.length > 0) drawPts(playCtx, playC, playgroundSamples, 'rgba(45,125,70,0.7)', 4, playBounds.xMin, playBounds.xMax, playBounds.yMin, playBounds.yMax);
+    
+    document.getElementById('playgroundPoints').textContent = playgroundData.length;
+}
+
+function addPlaygroundPoint(e) {
+    const rect = playC.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) * (playC.width / rect.width);
+    const cy = (e.clientY - rect.top) * (playC.height / rect.height);
+    const pad = 40;
+    const x = (cx - pad) / (playC.width - 2 * pad);
+    const y = 1 - (cy - pad) / (playC.height - 2 * pad);
+    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+        playgroundData.push({ x, y });
+        playgroundTrained = false; playgroundMLPTrained = false;
+        playgroundSamples = [];
+        drawPlayground();
+    }
+}
+
+playC.addEventListener('mousedown', addPlaygroundPoint);
+playC.addEventListener('mousemove', (e) => { if (e.buttons === 1) addPlaygroundPoint(e); });
+playC.addEventListener('touchstart', (e) => { e.preventDefault(); addPlaygroundPoint(e.touches[0]); });
+playC.addEventListener('touchmove', (e) => { e.preventDefault(); addPlaygroundPoint(e.touches[0]); });
+
+document.getElementById('clearPlayground').addEventListener('click', () => {
+    playgroundData = []; playgroundMLP = null; playgroundMDN = null;
+    playgroundTrained = false; playgroundMLPTrained = false; playgroundSamples = [];
+    document.getElementById('playgroundEpoch').textContent = '0';
+    document.getElementById('playgroundLoss').textContent = '-';
+    document.getElementById('playgroundStatus').textContent = 'Draw points';
+    drawPlayground();
+});
+
+document.getElementById('trainPlaygroundMLP').addEventListener('click', async function() {
+    if (playgroundData.length < 5) { alert('Draw more points first'); return; }
+    this.disabled = true;
+    const xs = playgroundData.map(p => p.x), ys = playgroundData.map(p => p.y);
+    const xMean = xs.reduce((a,b)=>a+b,0)/xs.length, yMean = ys.reduce((a,b)=>a+b,0)/ys.length;
+    const xStd = Math.sqrt(xs.reduce((s,x)=>s+(x-xMean)**2,0)/xs.length) || 1;
+    const yStd = Math.sqrt(ys.reduce((s,y)=>s+(y-yMean)**2,0)/ys.length) || 1;
+    playgroundMLP = new MLP(1, 32, 1);
+    playgroundMLP.setNorm(xMean, xStd, yMean, yStd);
+    const X = new Matrix(xs.length, 1), Y = new Matrix(ys.length, 1);
+    for (let i = 0; i < xs.length; i++) { X.set(i, 0, xs[i]); Y.set(i, 0, ys[i]); }
+    document.getElementById('playgroundStatus').textContent = 'Training MLP...';
+    for (let e = 0; e < 800; e++) {
+        playgroundMLP.forward(X);
+        const loss = playgroundMLP.backward(Y, 0.05);
+        if (e % 40 === 0 || e === 799) {
+            document.getElementById('playgroundEpoch').textContent = e + 1;
+            document.getElementById('playgroundLoss').textContent = loss.toFixed(4);
+            playgroundMLPTrained = true; drawPlayground();
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+    document.getElementById('playgroundStatus').textContent = 'MLP Done';
+    this.disabled = false;
+});
+
+document.getElementById('trainPlayground').addEventListener('click', async function() {
+    if (playgroundData.length < 5) { alert('Draw more points first'); return; }
+    this.disabled = true;
+    const K = parseInt(document.getElementById('playgroundK').value);
+    const xs = playgroundData.map(p => p.x), ys = playgroundData.map(p => p.y);
+    const xMean = xs.reduce((a,b)=>a+b,0)/xs.length, yMean = ys.reduce((a,b)=>a+b,0)/ys.length;
+    const xStd = Math.sqrt(xs.reduce((s,x)=>s+(x-xMean)**2,0)/xs.length) || 1;
+    const yStd = Math.sqrt(ys.reduce((s,y)=>s+(y-yMean)**2,0)/ys.length) || 1;
+    playgroundMDN = new MDN(1, 32, K);
+    playgroundMDN.setNorm(xMean, xStd, yMean, yStd);
+    const X = new Matrix(xs.length, 1), Y = new Matrix(ys.length, 1);
+    for (let i = 0; i < xs.length; i++) { X.set(i, 0, xs[i]); Y.set(i, 0, ys[i]); }
+    document.getElementById('playgroundStatus').textContent = 'Training MDN...';
+    playgroundSamples = [];
+    for (let e = 0; e < 1500; e++) {
+        playgroundMDN.forward(X);
+        const loss = playgroundMDN.backward(Y, 0.03);
+        if (e % 50 === 0 || e === 1499) {
+            document.getElementById('playgroundEpoch').textContent = e + 1;
+            document.getElementById('playgroundLoss').textContent = loss.toFixed(3);
+            playgroundTrained = true; drawPlayground();
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+    document.getElementById('playgroundStatus').textContent = 'MDN Done';
+    this.disabled = false;
+});
+
+document.getElementById('samplePlayground').addEventListener('click', () => {
+    if (!playgroundTrained || !playgroundMDN) return;
+    playgroundSamples = [];
+    for (let i = 0; i < 100; i++) {
+        const x = 0.05 + Math.random() * 0.9;
+        const y = playgroundMDN.sample(x);
+        if (y > -0.2 && y < 1.2) playgroundSamples.push({ x, y });
+    }
+    drawPlayground();
+});
+
+// Init
+drawForward(); drawInverse(); drawMDN(); drawPlayground();
+</script>
+</body>
+</html>
